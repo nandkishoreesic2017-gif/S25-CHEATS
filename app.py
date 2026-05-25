@@ -1,13 +1,23 @@
 import requests , os , psutil , sys , jwt , pickle , json , binascii , time , urllib3 , base64 , datetime , re , socket , threading , ssl , pytz , aiohttp
 from flask import Flask, request, jsonify
 from protobuf_decoder.protobuf_decoder import Parser
-from xC4 import * ; from xHeaders import *
+from xC4 import *
+from xHeaders import *
 from datetime import datetime
 from google.protobuf.timestamp_pb2 import Timestamp
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrEq_pb2 , sQ_pb2 , Team_msg_pb2
 from cfonts import render, say
+
+
+loop = asyncio.new_event_loop()
+
+def start_loop():
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+threading.Thread(target=start_loop, daemon=True).start()
 
 
 #EMOTES BY NAJMI_FF_EXPERIMENT
@@ -569,9 +579,13 @@ def join_team():
     if not uids:
         return jsonify({"status": "error", "message": "Provide at least one UID"})
 
+    if loop.is_running():
     asyncio.run_coroutine_threadsafe(
-        perform_emote(team_code, uids, emote_id), loop
+        perform_emote(team_code, uids, emote_id),
+        loop
     )
+else:
+    return jsonify({"error": "Loop not running"}), 500
 
     return jsonify({
         "status": "success",
