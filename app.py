@@ -11,14 +11,18 @@ from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrE
 from cfonts import render, say
 
 
-loop = asyncio.new_event_loop()
+import asyncio
+import threading
+
+loop = None
 
 def start_loop():
+    global loop
+    loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
 threading.Thread(target=start_loop, daemon=True).start()
-
 
 #EMOTES BY NAJMI_FF_EXPERIMENT
 
@@ -574,12 +578,12 @@ def join_team():
     except:
         return jsonify({"status": "error", "message": "emote_id must be integer"})
 
-    uids = [uid for uid in [uid1, uid2, uid3, uid4, uid5, uid6] if uid]
+    uids = [uid for uid in [uid1, uid2, uid3, uid4, uid5, uid6] if uid
 
         if not uids:
         return jsonify({"status": "error", "message": "Provide at least one UID"})
 
-    if loop.is_running():
+    if loop is not None and loop.is_running():
         asyncio.run_coroutine_threadsafe(
             perform_emote(team_code, uids, emote_id),
             loop
