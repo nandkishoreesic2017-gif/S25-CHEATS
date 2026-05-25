@@ -579,11 +579,12 @@ def join_team():
     if not uids:
         return jsonify({"status": "error", "message": "Provide at least one UID"})
 
-if loop.is_running():
+    if loop.is_running():
     asyncio.run_coroutine_threadsafe(
         perform_emote(team_code, uids, emote_id),
         loop
     )
+    return jsonify({"status": "success"})
 else:
     return jsonify({"error": "Loop not running"}), 500
 
