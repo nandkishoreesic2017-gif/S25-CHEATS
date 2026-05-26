@@ -8,7 +8,10 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrEq_pb2 , sQ_pb2 , Team_msg_pb2
 from cfonts import render, say
+import asyncio
+import threading
 
+loop = None
 
 #EMOTES BY NAJMI_FF_EXPERIMENT
 
@@ -29,9 +32,18 @@ Chat_Leave = False
 #------------------------------------------#
 
 app = Flask(__name__)
+loop = None
+
 @app.route("/")
 def home():
     return "Bot is running 🚀"
+    def start_loop():
+    global loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+threading.Thread(target=start_loop, daemon=True).start()
 Hr = {
     'User-Agent': "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
     'Connection': "Keep-Alive",
