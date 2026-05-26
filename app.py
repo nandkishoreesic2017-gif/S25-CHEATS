@@ -11,20 +11,7 @@ from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrE
 from cfonts import render, say
 
 
-import asyncio
-import threading
 
-loop = None
-
-def start_loop():
-    global loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-threading.Thread(target=start_loop, daemon=True).start()
-
-#EMOTES BY NAJMI_FF_EXPERIMENT
 
 
 
@@ -527,7 +514,7 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
         await asyncio.sleep(reconnect_delay)
 # ---------------------- FLASK ROUTES ----------------------
 
-loop = None
+
 
 async def perform_emote(team_code: str, uids: list, emote_id: int):
     global key, iv, region, online_writer, BOT_UID
@@ -558,7 +545,6 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
         raise Exception(f"Failed to perform emote: {str(e)}")
 
 
-@app.route('/join')
 @app.route('/join')
 def join_team():
     global loop
