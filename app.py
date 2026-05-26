@@ -559,38 +559,65 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
 
 
 @app.route('/join')
+@app.route('/join')
 def join_team():
     global loop
+
     team_code = request.args.get('tc')
+    emote_id_str = request.args.get('emote_id')
+
     uid1 = request.args.get('uid1')
     uid2 = request.args.get('uid2')
     uid3 = request.args.get('uid3')
     uid4 = request.args.get('uid4')
     uid5 = request.args.get('uid5')
     uid6 = request.args.get('uid6')
-    emote_id_str = request.args.get('emote_id')
 
     if not team_code or not emote_id_str:
-        return jsonify({"status": "error", "message": "Missing tc or emote_id"})
+        return jsonify({
+            "status": "error",
+            "message": "Missing tc or emote_id"
+        })
 
     try:
         emote_id = int(emote_id_str)
     except:
-        return jsonify({"status": "error", "message": "emote_id must be integer"})
+        return jsonify({
+            "status": "error",
+            "message": "emote_id must be integer"
+        })
 
-    uids = [uid for uid in [uid1, uid2, uid3, uid4, uid5, uid6] if uid
+    uids = [
+        uid for uid in
+        [uid1, uid2, uid3, uid4, uid5, uid6]
+        if uid
+    ]
 
-        if not uids:
-        return jsonify({"status": "error", "message": "Provide at least one UID"})
+    if not uids:
+        return jsonify({
+            "status": "error",
+            "message": "Provide at least one UID"
+        })
 
     if loop is not None and loop.is_running():
         asyncio.run_coroutine_threadsafe(
             perform_emote(team_code, uids, emote_id),
             loop
         )
-        return jsonify({"status": "success"})
+
+        return jsonify({
+            "status": "success",
+            "team_code": team_code,
+            "uids": uids,
+            "emote_id": emote_id,
+            "message": "Emote triggered"
+        })
+
     else:
-        return jsonify({"error": "Loop not running"}), 500
+        return jsonify({
+            "status": "error",
+            "message": "Loop not running"
+        }), 500
     return jsonify({
         "status": "success",
         "team_code": team_code,
