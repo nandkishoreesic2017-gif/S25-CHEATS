@@ -539,39 +539,42 @@ loop = None
 async def perform_emote(team_code: str, uids: list, emote_id: int):
     global key, iv, region, online_writer, BOT_UID
 
-    try:
-        print("🔥 ENTERED perform_emote:", team_code, uids, emote_id)
+    print("🔥 perform_emote CALLED")
+    print("loop:", loop)
+    print("online_writer:", online_writer)
+    print("BOT_UID:", BOT_UID)
 
-        # 1. JOIN SQUAD
+    try:
         EM = await GenJoinSquadsPacket(team_code, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', EM)
 
         await asyncio.sleep(0.12)
 
-        # 2. EMOTE
         for uid_str in uids:
             uid = int(uid_str)
+
             H = await Emote_k(uid, emote_id, key, iv, region)
             await SEndPacKeT(None, online_writer, 'OnLine', H)
 
-        # 3. LEAVE
         LV = await ExiT(BOT_UID, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', LV)
 
         await asyncio.sleep(0.03)
-
-        print("✅ SUCCESS")
 
         return {
             "status": "success",
             "message": "Emote done"
         }
 
-except Exception as e:
-    import traceback
-    print("💥 EMOTE ERROR:", repr(e))
-    traceback.print_exc()
-    raise Exception(str(e))
+    except Exception as e:
+        import traceback
+        print("💥 EMOTE ERROR:", repr(e))
+        traceback.print_exc()
+
+        return {
+            "status": "error",
+            "message": str(e)
+        }
 @app.route('/join')
 def join_team():
     global loop
