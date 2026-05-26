@@ -609,23 +609,29 @@ def join_team():
         })
 
     future = asyncio.run_coroutine_threadsafe(
-    perform_emote(team_code, uids, emote_id),
-    loop
-)
+        perform_emote(team_code, uids, emote_id),
+        loop
+    )
 
-try:
-    result = future.result(timeout=10)
-    print("EMOTE RESULT:", result)
-except Exception as e:
-    print("EMOTE ERROR:", e)
+    try:
+        result = future.result(timeout=10)
+        print("EMOTE RESULT:", result)
 
-    return jsonify({
-        "status": "success",
-        "team_code": team_code,
-        "uids": uids,
-        "emote_id": emote_id_str,
-        "message": "Emote triggered"
-    })
+        return jsonify({
+            "status": "success",
+            "team_code": team_code,
+            "uids": uids,
+            "emote_id": emote_id_str,
+            "message": "Emote triggered"
+        })
+
+    except Exception as e:
+        print("EMOTE ERROR:", e)
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
 
 
 def run_flask():
