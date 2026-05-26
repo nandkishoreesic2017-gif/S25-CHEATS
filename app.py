@@ -567,12 +567,11 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
             "message": "Emote done"
         }
 
-    except Exception as e:
-        import traceback
-        print("💥 EMOTE ERROR:", str(e))
-        traceback.print_exc()
-
-        raise Exception(str(e))
+except Exception as e:
+    import traceback
+    print("💥 EMOTE ERROR:", repr(e))
+    traceback.print_exc()
+    raise Exception(str(e))
 @app.route('/join')
 def join_team():
     global loop
