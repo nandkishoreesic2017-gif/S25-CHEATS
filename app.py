@@ -10,7 +10,10 @@ from threading import Thread
 from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrEq_pb2 , sQ_pb2 , Team_msg_pb2
 from cfonts import render, say
 
+import asyncio
+import threading
 
+loop = None
 
 
 
@@ -599,7 +602,7 @@ def join_team():
 
 async def MaiiiinE():
     global loop, key, iv, region, BOT_UID
-
+    loop = asyncio.get_running_loop()
     # BOT LOGIN UID
     BOT_UID = int('4962573853')  # <-- FIXED BOT UID
 
