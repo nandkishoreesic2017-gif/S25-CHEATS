@@ -537,41 +537,42 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 
 loop = None
 async def perform_emote(team_code: str, uids: list, emote_id: int):
+    global key, iv, region, online_writer, BOT_UID
+
     try:
-    print("🔥 ENTERED perform_emote:", team_code, uids, emote_id)
+        print("🔥 ENTERED perform_emote:", team_code, uids, emote_id)
 
-    # 1. JOIN SQUAD
-    EM = await GenJoinSquadsPacket(team_code, key, iv)
-    await SEndPacKeT(None, online_writer, 'OnLine', EM)
+        # 1. JOIN SQUAD
+        EM = await GenJoinSquadsPacket(team_code, key, iv)
+        await SEndPacKeT(None, online_writer, 'OnLine', EM)
 
-    await asyncio.sleep(0.12)
+        await asyncio.sleep(0.12)
 
-    # 2. EMOTE
-    for uid_str in uids:
-        uid = int(uid_str)
-        H = await Emote_k(uid, emote_id, key, iv, region)
-        await SEndPacKeT(None, online_writer, 'OnLine', H)
+        # 2. EMOTE
+        for uid_str in uids:
+            uid = int(uid_str)
+            H = await Emote_k(uid, emote_id, key, iv, region)
+            await SEndPacKeT(None, online_writer, 'OnLine', H)
 
-    # 3. LEAVE
-    LV = await ExiT(BOT_UID, key, iv)
-    await SEndPacKeT(None, online_writer, 'OnLine', LV)
+        # 3. LEAVE
+        LV = await ExiT(BOT_UID, key, iv)
+        await SEndPacKeT(None, online_writer, 'OnLine', LV)
 
-    await asyncio.sleep(0.03)
+        await asyncio.sleep(0.03)
 
-    print("✅ SUCCESS")
+        print("✅ SUCCESS")
 
-    return {
-        "status": "success",
-        "message": "Emote done"
-    }
+        return {
+            "status": "success",
+            "message": "Emote done"
+        }
 
-except Exception as e:
-    import traceback
-    print("💥 EMOTE ERROR:", str(e))
-    traceback.print_exc()
+    except Exception as e:
+        import traceback
+        print("💥 EMOTE ERROR:", str(e))
+        traceback.print_exc()
 
-    raise Exception(str(e))
-
+        raise Exception(str(e))
 @app.route('/join')
 def join_team():
     global loop  # IMPORTANT
