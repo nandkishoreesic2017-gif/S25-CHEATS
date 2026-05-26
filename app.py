@@ -685,5 +685,7 @@ async def StarTinG():
             print(f"ErroR TcP - {e} => ResTarTinG ...")
 
 
-if __name__ == '__main__':
-    asyncio.run(StarTinG())
+threading.Thread(
+    target=lambda: asyncio.run(StarTinG()),
+    daemon=True
+).start()
