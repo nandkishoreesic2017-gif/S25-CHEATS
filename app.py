@@ -626,7 +626,10 @@ def join_team():
         })
 
     except Exception as e:
-        print("EMOTE ERROR:", e)
+    import traceback
+    print("💥 EMOTE ERROR:", str(e))
+    print("📌 FULL TRACE:")
+    traceback.print_exc()
 
         return jsonify({
             "status": "error",
