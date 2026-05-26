@@ -537,15 +537,9 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 
 loop = None
 async def perform_emote(team_code: str, uids: list, emote_id: int):
-    global key, iv, region, online_writer, BOT_UID
-
-    print("🔥 perform_emote STARTED:", team_code, uids, emote_id)
-
-    if online_writer is None:
-        print("❌ Bot not connected")
-        raise Exception("Bot not connected")
-
     try:
+        print("🔥 ENTERED perform_emote:", team_code, uids, emote_id)
+
         # 1. JOIN SQUAD (super fast)
         EM = await GenJoinSquadsPacket(team_code, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', EM)
@@ -573,9 +567,11 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
         }
 
     except Exception as e:
+        import traceback
         print("💥 ERROR in perform_emote:", str(e))
-        raise Exception(f"Failed to perform emote: {str(e)}")
+        traceback.print_exc()
 
+        raise Exception(f"Failed to perform emote: {str(e)}")
 
 @app.route('/join')
 def join_team():
