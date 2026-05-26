@@ -29,7 +29,9 @@ Chat_Leave = False
 #------------------------------------------#
 
 app = Flask(__name__)
-
+@app.route("/")
+def home():
+    return "Bot is running 🚀"
 Hr = {
     'User-Agent': "Dalvik/2.1.0 (Linux; U; Android 11; ASUS_Z01QD Build/PI)",
     'Connection': "Keep-Alive",
