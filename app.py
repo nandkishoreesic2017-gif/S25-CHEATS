@@ -536,33 +536,44 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 # ---------------------- FLASK ROUTES ----------------------
 
 loop = None
-
 async def perform_emote(team_code: str, uids: list, emote_id: int):
     global key, iv, region, online_writer, BOT_UID
 
+    print("🔥 perform_emote STARTED:", team_code, uids, emote_id)
+
     if online_writer is None:
+        print("❌ Bot not connected")
         raise Exception("Bot not connected")
 
     try:
         # 1. JOIN SQUAD (super fast)
         EM = await GenJoinSquadsPacket(team_code, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', EM)
-        await asyncio.sleep(0.12)  # minimal sync delay
+
+        await asyncio.sleep(0.12)
 
         # 2. PERFORM EMOTE instantly
         for uid_str in uids:
             uid = int(uid_str)
+
             H = await Emote_k(uid, emote_id, key, iv, region)
             await SEndPacKeT(None, online_writer, 'OnLine', H)
 
-        # 3. LEAVE SQUAD instantly (correct bot UID)
+        # 3. LEAVE SQUAD instantly
         LV = await ExiT(BOT_UID, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', LV)
+
         await asyncio.sleep(0.03)
 
-        return {"status": "success", "message": "Emote done & bot left instantly"}
+        print("✅ perform_emote FINISHED SUCCESSFULLY")
+
+        return {
+            "status": "success",
+            "message": "Emote done & bot left instantly"
+        }
 
     except Exception as e:
+        print("💥 ERROR in perform_emote:", str(e))
         raise Exception(f"Failed to perform emote: {str(e)}")
 
 
@@ -597,10 +608,16 @@ def join_team():
             "message": "Provide at least one UID"
         })
 
-    asyncio.run_coroutine_threadsafe(
-        perform_emote(team_code, uids, emote_id),
-        loop
-    )
+    future = asyncio.run_coroutine_threadsafe(
+    perform_emote(team_code, uids, emote_id),
+    loop
+)
+
+try:
+    result = future.result(timeout=10)
+    print("EMOTE RESULT:", result)
+except Exception as e:
+    print("EMOTE ERROR:", e)
 
     return jsonify({
         "status": "success",
