@@ -1,8 +1,7 @@
 import requests , os , psutil , sys , jwt , pickle , json , binascii , time , urllib3 , base64 , datetime , re , socket , threading , ssl , pytz , aiohttp
 from flask import Flask, request, jsonify
 from protobuf_decoder.protobuf_decoder import Parser
-from xC4 import *
-from xHeaders import *
+from xC4 import * ; from xHeaders import *
 from datetime import datetime
 from google.protobuf.timestamp_pb2 import Timestamp
 from concurrent.futures import ThreadPoolExecutor
@@ -10,11 +9,8 @@ from threading import Thread
 from Pb2 import DEcwHisPErMsG_pb2 , MajoRLoGinrEs_pb2 , PorTs_pb2 , MajoRLoGinrEq_pb2 , sQ_pb2 , Team_msg_pb2
 from cfonts import render, say
 
-import asyncio
-import threading
 
-loop = None
-
+#EMOTES BY NAJMI_FF_EXPERIMENT
 
 
 
@@ -517,54 +513,85 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
         await asyncio.sleep(reconnect_delay)
 # ---------------------- FLASK ROUTES ----------------------
 
+loop = None
 
-
-
-        # 3. LEAVE SQUAD instantly (correct bot UID)
-        await asyncio.sleep(1.5) 
- LV = await ExiT(BOT_UID, key, iv)
-        await SEndPacKeT(None, online_writer, 'OnLine', LV)
-        await asyncio.sleep(0.03)
-
-        return {"status": "success", "message": "Emote done & bot left instantly"}
-
-    async def perform_emote(team_code: str, uids: list, emote_id: int):
+async def perform_emote(team_code: str, uids: list, emote_id: int):
     global key, iv, region, online_writer, BOT_UID
 
     if online_writer is None:
         raise Exception("Bot not connected")
 
     try:
-        print("Joining squad:", team_code)
-
+        # 1. JOIN SQUAD (super fast)
         EM = await GenJoinSquadsPacket(team_code, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', EM)
+        await asyncio.sleep(0.12)  # minimal sync delay
 
-        await asyncio.sleep(2)
-
-        print("Sending emote...")
-
+        # 2. PERFORM EMOTE instantly
         for uid_str in uids:
             uid = int(uid_str)
             H = await Emote_k(uid, emote_id, key, iv, region)
             await SEndPacKeT(None, online_writer, 'OnLine', H)
-            await asyncio.sleep(0.5)
 
-        print("Leaving squad...")
-
+        # 3. LEAVE SQUAD instantly (correct bot UID)
         LV = await ExiT(BOT_UID, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', LV)
+        await asyncio.sleep(0.03)
 
-        return {"status": "success", "message": "Emote sent successfully"}
+        return {"status": "success", "message": "Emote done & bot left instantly"}
 
     except Exception as e:
-        print("ERROR:", e)
-        return {"status": "error", "message": str(e)}
+        raise Exception(f"Failed to perform emote: {str(e)}")
+
+
+@app.route('/join')
+def join_team():
+    global loop
+    team_code = request.args.get('tc')
+    uid1 = request.args.get('uid1')
+    uid2 = request.args.get('uid2')
+    uid3 = request.args.get('uid3')
+    uid4 = request.args.get('uid4')
+    uid5 = request.args.get('uid5')
+    uid6 = request.args.get('uid6')
+    emote_id_str = request.args.get('emote_id')
+
+    if not team_code or not emote_id_str:
+        return jsonify({"status": "error", "message": "Missing tc or emote_id"})
+
+    try:
+        emote_id = int(emote_id_str)
+    except:
+        return jsonify({"status": "error", "message": "emote_id must be integer"})
+
+    uids = [uid for uid in [uid1, uid2, uid3, uid4, uid5, uid6] if uid]
+
+    if not uids:
+        return jsonify({"status": "error", "message": "Provide at least one UID"})
+
+    asyncio.run_coroutine_threadsafe(
+        perform_emote(team_code, uids, emote_id), loop
+    )
+
+    return jsonify({
+        "status": "success",
+        "team_code": team_code,
+        "uids": uids,
+        "emote_id": emote_id_str,
+        "message": "Emote triggered"
+    })
+
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+
+
 # ---------------------- MAIN BOT SYSTEM ----------------------
 
 async def MaiiiinE():
     global loop, key, iv, region, BOT_UID
-    loop = asyncio.get_running_loop()
+
     # BOT LOGIN UID
     BOT_UID = int('4962573853')  # <-- FIXED BOT UID
 
@@ -647,7 +674,5 @@ async def StarTinG():
             print(f"ErroR TcP - {e} => ResTarTinG ...")
 
 
-threading.Thread(
-    target=lambda: asyncio.run(StarTinG()),
-    daemon=True
-).start()
+if __name__ == '__main__':
+    asyncio.run(StarTinG())
