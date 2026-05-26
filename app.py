@@ -577,15 +577,16 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
 def join_team():
     global loop
 
-    team_code = request.args.get("tc")
+    print("🔥 LOOP VALUE:", loop)
+    print("🔥 ONLINE_WRITER:", online_writer)
 
+    team_code = request.args.get("tc")
     uid1 = request.args.get("uid1")
     uid2 = request.args.get("uid2")
     uid3 = request.args.get("uid3")
     uid4 = request.args.get("uid4")
     uid5 = request.args.get("uid5")
     uid6 = request.args.get("uid6")
-
     emote_id_str = request.args.get("emote_id")
 
     try:
@@ -604,12 +605,12 @@ def join_team():
             "message": "Provide at least one UID"
         })
 
-    try:
-        future = asyncio.run_coroutine_threadsafe(
-            perform_emote(team_code, uids, emote_id),
-            loop
-        )
+    future = asyncio.run_coroutine_threadsafe(
+        perform_emote(team_code, uids, emote_id),
+        loop
+    )
 
+    try:
         result = future.result(timeout=10)
         print("EMOTE RESULT:", result)
 
