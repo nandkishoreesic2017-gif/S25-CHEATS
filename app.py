@@ -528,11 +528,11 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 
         return {"status": "success", "message": "Emote done & bot left instantly"}
 
-    except Exceptioasync def perform_emote(team_code: str, uids: list, emote_id: int):
+    async def perform_emote(team_code: str, uids: list, emote_id: int):
     global key, iv, region, online_writer, BOT_UID
 
     if online_writer is None:
-        raise Exception("Bot not connected to online server")
+        raise Exception("Bot not connected")
 
     try:
         print("Joining squad:", team_code)
@@ -555,67 +555,11 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
         LV = await ExiT(BOT_UID, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', LV)
 
-        return {
-            "status": "success",
-            "message": "Emote sent successfully"
-        }
+        return {"status": "success", "message": "Emote sent successfully"}
 
     except Exception as e:
-        print("ERROR:", str(e))
-        raise Exception(str(e))n as e:
-        raise Exception(f"Failed to perform emote: {str(e)}")
-
-
-@app.route('/join')
-def join_team():
-    global loop
-
-    team_code = request.args.get('tc')
-    uid1 = request.args.get('uid1')
-    uid2 = request.args.get('uid2')
-    uid3 = request.args.get('uid3')
-    uid4 = request.args.get('uid4')
-    uid5 = request.args.get('uid5')
-    uid6 = request.args.get('uid6')
-    emote_id_str = request.args.get('emote_id')
-
-    if not team_code or not emote_id_str:
-        return jsonify({
-            "status": "error",
-            "message": "Missing tc or emote_id"
-        })
-
-    try:
-        emote_id = int(emote_id_str)
-    except:
-        return jsonify({
-            "status": "error",
-            "message": "Invalid emote_id"
-        })
-
-    uids = [u for u in [uid1, uid2, uid3, uid4, uid5, uid6] if u]
-
-    if not uids:
-        return jsonify({
-            "status": "error",
-            "message": "Provide UID"
-        })
-
-    if loop and loop.is_running():
-        asyncio.run_coroutine_threadsafe(
-            perform_emote(team_code, uids, emote_id),
-            loop
-        )
-
-        return jsonify({
-            "status": "success",
-            "message": "Emote triggered"
-        })
-
-    return jsonify({
-        "status": "error",
-        "message": "Loop not running"
-    }), 500
+        print("ERROR:", e)
+        return {"status": "error", "message": str(e)}
 # ---------------------- MAIN BOT SYSTEM ----------------------
 
 async def MaiiiinE():
