@@ -559,38 +559,42 @@ def join_team():
     emote_id_str = request.args.get('emote_id')
 
     if not team_code or not emote_id_str:
-        return jsonify({"status":"error","message":"Missing tc or emote_id"})
+        return jsonify({
+            "status": "error",
+            "message": "Missing tc or emote_id"
+        })
 
-    emote_id = int(emote_id_str)
+    try:
+        emote_id = int(emote_id_str)
+    except:
+        return jsonify({
+            "status": "error",
+            "message": "Invalid emote_id"
+        })
 
     uids = [u for u in [uid1, uid2, uid3, uid4, uid5, uid6] if u]
 
     if not uids:
-        return jsonify({"status":"error","message":"Provide UID"})
+        return jsonify({
+            "status": "error",
+            "message": "Provide UID"
+        })
 
     if loop and loop.is_running():
         asyncio.run_coroutine_threadsafe(
             perform_emote(team_code, uids, emote_id),
             loop
         )
-        return jsonify({"status":"success","message":"Emote triggered"})
 
-    return jsonify({"status":"error","message":"Loop not running"})
-        }), 500
+        return jsonify({
+            "status": "success",
+            "message": "Emote triggered"
+        })
+
     return jsonify({
-        "status": "success",
-        "team_code": team_code,
-        "uids": uids,
-        "emote_id": emote_id_str,
-        "message": "Emote triggered"
-    })
-
-
-def run_flask():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
-
-
+        "status": "error",
+        "message": "Loop not running"
+    }), 500
 # ---------------------- MAIN BOT SYSTEM ----------------------
 
 async def MaiiiinE():
