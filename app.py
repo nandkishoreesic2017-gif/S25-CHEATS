@@ -519,24 +519,6 @@ async def TcPChaT(ip, port, AutHToKen, key, iv, LoGinDaTaUncRypTinG, ready_event
 
 
 
-async def perform_emote(team_code: str, uids: list, emote_id: int):
-    global key, iv, region, online_writer, BOT_UID
-
-    if online_writer is None:
-        raise Exception("Bot not connected")
-
-    try:
-        # 1. JOIN SQUAD (super fast)
-        EM = await GenJoinSquadsPacket(team_code, key, iv)
-        await SEndPacKeT(None, online_writer, 'OnLine', EM)
-       print("Joining squad:", team_code)
-await asyncio.sleep(2.5)   # minimal sync delay
-
-        # 2. PERFORM EMOTE instantly
-        for uid_str in uids:
-            uid = int(uid_str)
-            H = await Emote_k(uid, emote_id, key, iv, region)
-            await SEndPacKeT(None, online_writer, 'OnLine', H)
 
         # 3. LEAVE SQUAD instantly (correct bot UID)
         await asyncio.sleep(1.5) 
@@ -546,7 +528,41 @@ await asyncio.sleep(2.5)   # minimal sync delay
 
         return {"status": "success", "message": "Emote done & bot left instantly"}
 
+    except Exceptioasync def perform_emote(team_code: str, uids: list, emote_id: int):
+    global key, iv, region, online_writer, BOT_UID
+
+    if online_writer is None:
+        raise Exception("Bot not connected to online server")
+
+    try:
+        print("Joining squad:", team_code)
+
+        EM = await GenJoinSquadsPacket(team_code, key, iv)
+        await SEndPacKeT(None, online_writer, 'OnLine', EM)
+
+        await asyncio.sleep(2)
+
+        print("Sending emote...")
+
+        for uid_str in uids:
+            uid = int(uid_str)
+            H = await Emote_k(uid, emote_id, key, iv, region)
+            await SEndPacKeT(None, online_writer, 'OnLine', H)
+            await asyncio.sleep(0.5)
+
+        print("Leaving squad...")
+
+        LV = await ExiT(BOT_UID, key, iv)
+        await SEndPacKeT(None, online_writer, 'OnLine', LV)
+
+        return {
+            "status": "success",
+            "message": "Emote sent successfully"
+        }
+
     except Exception as e:
+        print("ERROR:", str(e))
+        raise Exception(str(e))n as e:
         raise Exception(f"Failed to perform emote: {str(e)}")
 
 
