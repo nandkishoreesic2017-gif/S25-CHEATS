@@ -11,7 +11,15 @@ from cfonts import render, say
 import asyncio
 import threading
 
-loop = None
+loop = asyncio.new_event_loop()
+
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+t = threading.Thread(target=start_loop, args=(loop,))
+t.daemon = True
+t.start()
 
 #EMOTES BY NAJMI_FF_EXPERIMENT
 
@@ -560,19 +568,9 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
 
 @app.route('/join')
 def join_team():
-    global loop
-    team_code = request.args.get('tc')
-    uid1 = request.args.get('uid1')
-    uid2 = request.args.get('uid2')
-    uid3 = request.args.get('uid3')
-    uid4 = request.args.get('uid4')
-    uid5 = request.args.get('uid5')
-    uid6 = request.args.get('uid6')
-    emote_id_str = request.args.get('emote_id')
+    global loop  # 👈 MUST ADD THIS
 
-    if not team_code or not emote_id_str:
-        return jsonify({"status": "error", "message": "Missing tc or emote_id"})
-
+    emote_id_str = request.args.get("emote_id")
     try:
         emote_id = int(emote_id_str)
     except:
@@ -584,7 +582,8 @@ def join_team():
         return jsonify({"status": "error", "message": "Provide at least one UID"})
 
     asyncio.run_coroutine_threadsafe(
-        perform_emote(team_code, uids, emote_id), loop
+        perform_emote(team_code, uids, emote_id),
+        loop
     )
 
     return jsonify({
