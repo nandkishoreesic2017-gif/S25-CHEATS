@@ -37,7 +37,7 @@ loop = None
 @app.route("/")
 def home():
     return "Bot is running 🚀"
-    def start_loop():
+def start_loop():
     global loop
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
