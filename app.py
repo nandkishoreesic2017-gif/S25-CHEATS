@@ -575,7 +575,7 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
         raise Exception(str(e))
 @app.route('/join')
 def join_team():
-    global loop  # IMPORTANT
+    global loop
 
     team_code = request.args.get("tc")
 
@@ -604,12 +604,12 @@ def join_team():
             "message": "Provide at least one UID"
         })
 
-    future = asyncio.run_coroutine_threadsafe(
-        perform_emote(team_code, uids, emote_id),
-        loop
-    )
-
     try:
+        future = asyncio.run_coroutine_threadsafe(
+            perform_emote(team_code, uids, emote_id),
+            loop
+        )
+
         result = future.result(timeout=10)
         print("EMOTE RESULT:", result)
 
@@ -621,16 +621,15 @@ def join_team():
             "message": "Emote triggered"
         })
 
-except Exception as e:
-    import traceback
-    print("💥 EMOTE ERROR:", str(e))
-    print("📌 FULL TRACE:")
-    traceback.print_exc()
+    except Exception as e:
+        import traceback
+        print("💥 EMOTE ERROR:", str(e))
+        traceback.print_exc()
 
-    return jsonify({
-        "status": "error",
-        "message": str(e)
-    })
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
 
 
 def run_flask():
