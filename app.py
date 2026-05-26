@@ -529,7 +529,8 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
         # 1. JOIN SQUAD (super fast)
         EM = await GenJoinSquadsPacket(team_code, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', EM)
-        await asyncio.sleep(0.12)  # minimal sync delay
+       print("Joining squad:", team_code)
+await asyncio.sleep(2.5)   # minimal sync delay
 
         # 2. PERFORM EMOTE instantly
         for uid_str in uids:
@@ -538,7 +539,8 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
             await SEndPacKeT(None, online_writer, 'OnLine', H)
 
         # 3. LEAVE SQUAD instantly (correct bot UID)
-        LV = await ExiT(BOT_UID, key, iv)
+        await asyncio.sleep(1.5) 
+ LV = await ExiT(BOT_UID, key, iv)
         await SEndPacKeT(None, online_writer, 'OnLine', LV)
         await asyncio.sleep(0.03)
 
