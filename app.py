@@ -621,16 +621,16 @@ def join_team():
             "message": "Emote triggered"
         })
 
-    except Exception as e:
+except Exception as e:
     import traceback
     print("💥 EMOTE ERROR:", str(e))
     print("📌 FULL TRACE:")
     traceback.print_exc()
 
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        })
+    return jsonify({
+        "status": "error",
+        "message": str(e)
+    })
 
 
 def run_flask():
