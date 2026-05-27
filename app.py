@@ -341,27 +341,16 @@ def join_team():
             ),
             loop
         )
+try:
+    result = future.result(timeout=120)
+    return jsonify(result)
 
-        try:
-            result = future.result(timeout=120)
-        except Exception as e:
-            return jsonify({
-            "status": "error",
-            "message": str(e)
+except Exception as e:
+    traceback.print_exc()
+    return jsonify({
+        "status": "error",
+        "message": str(e)
     })
-
-       return jsonify(result)
-
-        return jsonify(result)
-
-    except Exception as e:
-
-        traceback.print_exc()
-
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        })
 
 # ========================= FLASK RUN =========================
 
