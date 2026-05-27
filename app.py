@@ -342,7 +342,15 @@ def join_team():
             loop
         )
 
-        result = future.result(timeout=30)
+        try:
+    result = future.result(timeout=120)
+except Exception as e:
+    return jsonify({
+        "status": "error",
+        "message": str(e)
+    })
+
+return jsonify(result)
 
         return jsonify(result)
 
