@@ -2,6 +2,7 @@
 
 import asyncio
 import threading
+import traceback
 
 app = Flask(__name__)
 
@@ -16,10 +17,18 @@ threading.Thread(
     daemon=True
 ).start()
 
-# ========================= FIXED SEND PACKET =========================
+# ========================= GLOBALS =========================
+
+online_writer = None
+whisper_writer = None
+BOT_UID = 4962573853
+
+# ========================= SAFE SEND PACKET =========================
 
 async def SEndPacKeT(OnLinE, ChaT, TypE, PacKeT):
-    global online_writer, whisper_writer
+
+    global online_writer
+    global whisper_writer
 
     try:
 
@@ -46,23 +55,153 @@ async def SEndPacKeT(OnLinE, ChaT, TypE, PacKeT):
 
     except Exception as e:
         print(f"❌ Packet send error => {e}")
+        traceback.print_exc()
 
-# ========================= FIXED PERFORM EMOTE =========================
+# ========================= ONLINE TCP =========================
+
+async def TcPOnLine(ip, port, key, iv, AutHToKen, reconnect_delay=2):
+
+    global online_writer
+
+    while True:
+
+        try:
+
+            print(f"🔥 Connecting Online TCP {ip}:{port}")
+
+            reader, writer = await asyncio.open_connection(
+                ip,
+                int(port)
+            )
+
+            online_writer = writer
+
+            bytes_payload = bytes.fromhex(AutHToKen)
+
+            online_writer.write(bytes_payload)
+
+            await online_writer.drain()
+
+            print("✅ Online socket connected")
+
+            while True:
+
+                data = await reader.read(9999)
+
+                if not data:
+                    break
+
+            print("⚠️ Online socket disconnected")
+
+            try:
+                online_writer.close()
+                await online_writer.wait_closed()
+            except:
+                pass
+
+            online_writer = None
+
+        except Exception as e:
+
+            print(f"❌ Online socket error => {e}")
+
+            traceback.print_exc()
+
+            online_writer = None
+
+        await asyncio.sleep(reconnect_delay)
+
+# ========================= CHAT TCP =========================
+
+async def TcPChaT(
+    ip,
+    port,
+    AutHToKen,
+    key,
+    iv,
+    LoGinDaTaUncRypTinG,
+    ready_event,
+    region,
+    reconnect_delay=2
+):
+
+    global whisper_writer
+
+    while True:
+
+        try:
+
+            print(f"🔥 Connecting Chat TCP {ip}:{port}")
+
+            reader, writer = await asyncio.open_connection(
+                ip,
+                int(port)
+            )
+
+            whisper_writer = writer
+
+            bytes_payload = bytes.fromhex(AutHToKen)
+
+            whisper_writer.write(bytes_payload)
+
+            await whisper_writer.drain()
+
+            print("✅ Chat socket connected")
+
+            ready_event.set()
+
+            while True:
+
+                data = await reader.read(9999)
+
+                if not data:
+                    break
+
+            print("⚠️ Chat socket disconnected")
+
+            try:
+                whisper_writer.close()
+                await whisper_writer.wait_closed()
+            except:
+                pass
+
+            whisper_writer = None
+
+        except Exception as e:
+
+            print(f"❌ Chat socket error => {e}")
+
+            traceback.print_exc()
+
+            whisper_writer = None
+
+        await asyncio.sleep(reconnect_delay)
+
+# ========================= EMOTE SYSTEM =========================
 
 async def perform_emote(team_code: str, uids: list, emote_id: int):
-    global key, iv, region, online_writer, BOT_UID
+
+    global key
+    global iv
+    global region
+    global BOT_UID
 
     try:
 
         if online_writer is None:
+
             return {
                 "status": "error",
                 "message": "Bot offline"
             }
 
-        print("🔥 Joining squad...")
+        print("🔥 Joining squad")
 
-        EM = await GenJoinSquadsPacket(team_code, key, iv)
+        EM = await GenJoinSquadsPacket(
+            team_code,
+            key,
+            iv
+        )
 
         await SEndPacKeT(
             None,
@@ -73,7 +212,7 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
 
         await asyncio.sleep(2)
 
-        print("🔥 Sending emotes...")
+        print("🔥 Sending emotes")
 
         for uid_str in uids:
 
@@ -96,12 +235,13 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
                     H
                 )
 
-                await asyncio.sleep(0.4)
+                await asyncio.sleep(0.5)
 
             except Exception as e:
-                print(f"UID emote error => {e}")
 
-        print("🔥 Leaving squad...")
+                print(f"❌ Emote UID error => {e}")
+
+        print("🔥 Leaving squad")
 
         LV = await ExiT(
             BOT_UID,
@@ -125,8 +265,6 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
 
     except Exception as e:
 
-        import traceback
-
         traceback.print_exc()
 
         return {
@@ -134,7 +272,12 @@ async def perform_emote(team_code: str, uids: list, emote_id: int):
             "message": str(e)
         }
 
-# ========================= FIXED JOIN API =========================
+# ========================= FLASK =========================
+
+@app.route("/")
+def home():
+
+    return "Bot Running 🚀"
 
 @app.route('/join')
 def join_team():
@@ -155,6 +298,7 @@ def join_team():
         emote_id_str = request.args.get("emote_id")
 
         if not team_code:
+
             return jsonify({
                 "status": "error",
                 "message": "Missing team code"
@@ -164,6 +308,7 @@ def join_team():
             emote_id = int(emote_id_str)
 
         except:
+
             return jsonify({
                 "status": "error",
                 "message": "Invalid emote id"
@@ -176,6 +321,7 @@ def join_team():
         ]
 
         if len(uids) == 0:
+
             return jsonify({
                 "status": "error",
                 "message": "No UIDs provided"
@@ -196,8 +342,6 @@ def join_team():
 
     except Exception as e:
 
-        import traceback
-
         traceback.print_exc()
 
         return jsonify({
@@ -205,22 +349,39 @@ def join_team():
             "message": str(e)
         })
 
-# ========================= FIXED MAIN =========================
+# ========================= FLASK RUN =========================
+
+def run_flask():
+
+    port = int(
+        os.environ.get("PORT", 10000)
+    )
+
+    app.run(
+        host='0.0.0.0',
+        port=port,
+        debug=False,
+        use_reloader=False
+    )
+
+# ========================= MAIN =========================
 
 async def MaiiiinE():
 
     global key
     global iv
     global region
-    global BOT_UID
-
-    BOT_UID = int('4962573853')
 
     Uid = '4428929944'
 
     Pw = '0CF80D0C7AC19A7527BDECBE765A678D57817F89509BD259165F4CE2C3CCBA9B'
 
-    open_id, access_token = await GeNeRaTeAccEss(Uid, Pw)
+    print("🔥 Generating access token")
+
+    open_id, access_token = await GeNeRaTeAccEss(
+        Uid,
+        Pw
+    )
 
     if not open_id:
 
@@ -233,11 +394,13 @@ async def MaiiiinE():
         access_token
     )
 
+    print("🔥 Major login")
+
     MajoRLoGinResPonsE = await MajorLogin(PyL)
 
     if not MajoRLoGinResPonsE:
 
-        print("❌ Login failed")
+        print("❌ Major login failed")
 
         return
 
@@ -260,6 +423,8 @@ async def MaiiiinE():
     iv = MajoRLoGinauTh.iv
 
     timestamp = MajoRLoGinauTh.timestamp
+
+    print("🔥 Getting login data")
 
     LoGinDaTa = await GetLoginData(
         UrL,
@@ -285,9 +450,14 @@ async def MaiiiinE():
 
     ChaTiP, ChaTporT = ChaTPorTs.split(":")
 
-    print("🔥 Bot connected")
+    print("🔥 Equipping emote")
 
-    equie_emote(ToKen, UrL)
+    try:
+        equie_emote(ToKen, UrL)
+    except Exception as e:
+        print(e)
+
+    print("🔥 Generating auth token")
 
     AutHToKen = await xAuThSTarTuP(
         int(TarGeT),
@@ -333,12 +503,14 @@ async def MaiiiinE():
 
     flask_thread.start()
 
+    print("✅ BOT ONLINE")
+
     await asyncio.gather(
         task1,
         task2
     )
 
-# ========================= FIXED START =========================
+# ========================= AUTO RESTART =========================
 
 async def StarTinG():
 
@@ -353,15 +525,15 @@ async def StarTinG():
 
         except asyncio.TimeoutError:
 
-            print("🔥 Token expired restarting...")
+            print("🔥 Token expired restarting")
 
         except Exception as e:
 
-            import traceback
+            print(f"❌ Main crash => {e}")
 
             traceback.print_exc()
 
-            await asyncio.sleep(5)
+        await asyncio.sleep(5)
 
 # ========================= START =========================
 
