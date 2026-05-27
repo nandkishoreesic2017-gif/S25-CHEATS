@@ -165,16 +165,16 @@ async def TcPChaT(
 
             print("⚠️ Chat socket disconnected")
 
-try:
-    whisper_writer.close()
-    await whisper_writer.wait_closed()
+    try:
+        whisper_writer.close()
+        await whisper_writer.wait_closed()
 
-except Exception as e:
-    print(f"❌ Chat socket error => {e}")
-    traceback.print_exc()
+    except Exception as e:
+         print(f"❌ Chat socket error => {e}")
+         traceback.print_exc()
 
-whisper_writer = None
-await asyncio.sleep(reconnect_delay)
+    whisper_writer = None
+    await asyncio.sleep(reconnect_delay)
            
 
 # ========================= EMOTE SYSTEM =========================
