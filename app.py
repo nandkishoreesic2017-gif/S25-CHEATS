@@ -350,7 +350,7 @@ except Exception as e:
     return jsonify({
         "status": "error",
         "message": str(e)
-    }) 
+    })
 # ========================= FLASK RUN =========================
 
 def run_flask():
